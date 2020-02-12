@@ -1,4 +1,4 @@
-; hi
+;
 @#$#@#$#@
 GRAPHICS-WINDOW
 210
