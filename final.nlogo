@@ -1,4 +1,49 @@
-; hi
+turtles-own [
+  gene ; 0 is selfish 1 is altruist
+  nourished? ;if turtle gets food within generation turtle is nourished
+
+]
+patches-own [
+  food?
+]
+
+to setup
+  clear-all
+  reset-ticks
+  initialize-turtles
+  initialize-resources
+end
+
+to initialize-turtles
+  create-turtles num-turtles
+end
+
+to initialize-resources
+  repeat num-foods [
+    ask one-of patches [
+      set pcolor green
+      set food? true
+    ]
+  ]
+end
+
+
+to go
+  repeat num-generations [
+    repeat 50 [
+      ask turtles [
+        set heading random 360
+        fd 1
+        if [pcolor] of patch-here = green [
+          ask patch-here [set pcolor black]
+          set nourished? true
+        ]
+      ]
+    ]
+  ]
+
+  tick
+end
 @#$#@#$#@
 GRAPHICS-WINDOW
 210
@@ -26,6 +71,85 @@ GRAPHICS-WINDOW
 1
 ticks
 30.0
+
+SLIDER
+25
+78
+197
+111
+num-turtles
+num-turtles
+0
+100
+19.0
+1
+1
+NIL
+HORIZONTAL
+
+BUTTON
+36
+30
+99
+63
+NIL
+setup\n
+NIL
+1
+T
+OBSERVER
+NIL
+NIL
+NIL
+NIL
+1
+
+BUTTON
+119
+31
+182
+64
+NIL
+go\n
+NIL
+1
+T
+OBSERVER
+NIL
+NIL
+NIL
+NIL
+1
+
+SLIDER
+24
+127
+196
+160
+num-foods
+num-foods
+0
+100
+10.0
+1
+1
+NIL
+HORIZONTAL
+
+SLIDER
+28
+180
+200
+213
+num-generations
+num-generations
+0
+100
+100.0
+1
+1
+NIL
+HORIZONTAL
 
 @#$#@#$#@
 ## WHAT IS IT?
