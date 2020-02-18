@@ -1,49 +1,4 @@
-turtles-own [
-  gene ; 0 is selfish 1 is altruist
-  nourished? ;if turtle gets food within generation turtle is nourished
 
-]
-patches-own [
-  food?
-]
-
-to setup
-  clear-all
-  reset-ticks
-  initialize-turtles
-  initialize-resources
-end
-
-to initialize-turtles
-  create-turtles num-turtles
-end
-
-to initialize-resources
-  repeat num-foods [
-    ask one-of patches [
-      set pcolor green
-      set food? true
-    ]
-  ]
-end
-
-
-to go
-  repeat num-generations [
-    repeat 50 [
-      ask turtles [
-        set heading random 360
-        fd 1
-        if [pcolor] of patch-here = green [
-          ask  [set pcolor black]
-          set nourished? true
-        ]
-      ]
-    ]
-  ]
-
-  tick
-end
 @#$#@#$#@
 GRAPHICS-WINDOW
 210
@@ -81,7 +36,7 @@ num-turtles
 num-turtles
 0
 100
-50.0
+19.0
 1
 1
 NIL
@@ -145,7 +100,22 @@ num-generations
 num-generations
 0
 100
-27.0
+100.0
+1
+1
+NIL
+HORIZONTAL
+
+SLIDER
+26
+245
+198
+278
+percent-altruists
+percent-altruists
+0
+100
+50.0
 1
 1
 NIL

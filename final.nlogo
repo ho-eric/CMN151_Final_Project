@@ -16,6 +16,12 @@ end
 
 to initialize-turtles
   create-turtles num-turtles
+  ask turtles [
+    if (random-float 100 < percent-altruists) [
+      set gene 1
+    ]
+  ]
+
 end
 
 to initialize-resources
@@ -146,6 +152,21 @@ num-generations
 0
 100
 100.0
+1
+1
+NIL
+HORIZONTAL
+
+SLIDER
+26
+245
+198
+278
+percent-altruists
+percent-altruists
+0
+100
+50.0
 1
 1
 NIL
