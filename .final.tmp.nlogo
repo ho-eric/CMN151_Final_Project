@@ -1,9 +1,84 @@
+turtles-own [
+  gene ; 0 is selfish 1 is altruist
+  nourished? ;if turtle gets food within generation turtle is nourished
+  will-reproduce?
 
+]
+patches-own [
+  food?
+]
+
+to setup
+  clear-all
+  reset-ticks
+  initialize-turtles
+  initialize-resources
+end
+
+to initialize-turtles
+  create-turtles num-turtles
+  ask turtles [
+    set nourished? false
+    if (random-float 100 < percent-altruists) [
+      set gene 1
+    ]
+  ]
+
+end
+
+to spawn [ alt num ]
+  hatch num [ set gene alt ]
+
+end
+
+
+to initialize-resources
+  ask patches [ set pcolor black ]
+  repeat num-foods [
+    ask one-of patches [
+      set pcolor green
+      set food? true
+    ]
+  ]
+end
+
+
+to go
+  repeat 100 [
+    ask turtles [
+      set heading random 360
+      fd 1
+      if [pcolor] of patch-here = green [
+        ask patch-here [set pcolor black]
+        set nourished? true
+      ]
+      if any? turtles-here [
+        set will-reproduce? true
+      ]
+    ]
+  ]
+
+  ask turtles [
+    if not nourished? [ die ]
+    if will-reproduce? and gene = 1 [
+      spawn 1 2
+    ]
+    if will-reproduce? and gene = 0 [
+      spawn 0 2
+    ]
+  ]
+  initialize-resources
+  ask turtles [ set will-reproduce? false set nourished? false ]
+
+
+
+  tick
+end
 @#$#@#$#@
 GRAPHICS-WINDOW
-210
+797
 10
-647
+1234
 448
 -1
 -1
@@ -28,24 +103,24 @@ ticks
 30.0
 
 SLIDER
-25
-78
-197
-111
+19
+136
+191
+169
 num-turtles
 num-turtles
 0
 100
-19.0
+3.0
 1
 1
 NIL
 HORIZONTAL
 
 BUTTON
-36
+25
 30
-99
+88
 63
 NIL
 setup\n
@@ -60,9 +135,9 @@ NIL
 1
 
 BUTTON
-119
+99
 31
-182
+162
 64
 NIL
 go\n
@@ -77,40 +152,25 @@ NIL
 1
 
 SLIDER
-24
-127
-196
-160
+18
+185
+190
+218
 num-foods
 num-foods
 0
 100
-10.0
+65.0
 1
 1
 NIL
 HORIZONTAL
 
 SLIDER
-28
-180
-200
-213
-num-generations
-num-generations
-0
-100
-100.0
-1
-1
-NIL
-HORIZONTAL
-
-SLIDER
-26
-245
-198
-278
+16
+233
+188
+266
 percent-altruists
 percent-altruists
 0
@@ -120,6 +180,42 @@ percent-altruists
 1
 NIL
 HORIZONTAL
+
+BUTTON
+172
+32
+235
+65
+NIL
+go
+T
+1
+T
+OBSERVER
+NIL
+NIL
+NIL
+NIL
+1
+
+PLOT
+268
+156
+468
+306
+Gene Distribution
+NIL
+NIL
+0.0
+10.0
+0.0
+10.0
+true
+false
+"" ""
+PENS
+"selfish" 1.0 0 -13840069 true "" "plot count turtles with [gene = 0]"
+"altruist" 1.0 0 -7500403 true "" "plot count turtles with [gene = 1]"
 
 @#$#@#$#@
 ## WHAT IS IT?
