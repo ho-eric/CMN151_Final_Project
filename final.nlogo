@@ -18,10 +18,15 @@ end
 to initialize-turtles
   create-turtles num-turtles
   ask turtles [
+    setxy random-xcor random-ycor
     set nourished? false
+    ;initializes a certain desired percent of altruists
     if (random-float 100 < percent-altruists) [
       set gene 1
     ]
+    if (gene = 0) [ set color red ]
+    if (gene = 1) [ set color green ]
+
   ]
 
 end
@@ -44,6 +49,7 @@ end
 
 
 to go
+  ;general movement per generation
   repeat 100 [
     ask turtles [
       set heading random 360
@@ -52,6 +58,7 @@ to go
         ask patch-here [set pcolor black]
         set nourished? true
       ]
+      ;turtles that cross paths will reproduce at the end of a generation
       if any? turtles-here [
         set will-reproduce? true
       ]
@@ -61,14 +68,20 @@ to go
   ask turtles [
     if not nourished? [ die ]
     if will-reproduce? and gene = 1 [
-      spawn 1 2
+      spawn 1 3
+      die
     ]
     if will-reproduce? and gene = 0 [
-      spawn 0 2
+      spawn 0 3
+      die
     ]
   ]
   initialize-resources
   ask turtles [ set will-reproduce? false set nourished? false ]
+  ;limits number of turtles on the map to ensure reasonable resource relevance
+  while ([count turtles > 100]) [
+    ask one-of turtles [ die ]
+  ]
 
 
 
@@ -109,19 +122,19 @@ SLIDER
 169
 num-turtles
 num-turtles
-0
+20
 100
-3.0
+100.0
 1
 1
 NIL
 HORIZONTAL
 
 BUTTON
-25
-30
-88
-63
+13
+18
+76
+51
 NIL
 setup\n
 NIL
@@ -135,12 +148,12 @@ NIL
 1
 
 BUTTON
-99
-31
-162
-64
-NIL
-go\n
+14
+63
+146
+96
+-> 1 Generation
+go
 NIL
 1
 T
@@ -160,7 +173,7 @@ num-foods
 num-foods
 0
 100
-65.0
+51.0
 1
 1
 NIL
@@ -182,10 +195,10 @@ NIL
 HORIZONTAL
 
 BUTTON
-172
-32
-235
-65
+84
+19
+147
+52
 NIL
 go
 T
@@ -199,13 +212,13 @@ NIL
 1
 
 PLOT
-268
-156
-468
-306
+222
+123
+422
+273
 Gene Distribution
-NIL
-NIL
+number of turtles
+RED = Selfish Green = Altruist
 0.0
 10.0
 0.0
@@ -214,8 +227,30 @@ true
 false
 "" ""
 PENS
-"selfish" 1.0 0 -13840069 true "" "plot count turtles with [gene = 0]"
-"altruist" 1.0 0 -7500403 true "" "plot count turtles with [gene = 1]"
+"selfish" 1.0 0 -2674135 true "" "plot count turtles with [gene = 0]"
+"altruist" 1.0 0 -13840069 true "" "plot count turtles with [gene = 1]"
+
+SWITCH
+27
+296
+176
+329
+alrtuists-share
+alrtuists-share
+1
+1
+-1000
+
+SWITCH
+27
+340
+290
+373
+altruists-share-w/other-altruists
+altruists-share-w/other-altruists
+1
+1
+-1000
 
 @#$#@#$#@
 ## WHAT IS IT?
