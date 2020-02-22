@@ -54,7 +54,7 @@ to go
     ask turtles [
       set heading random 360
       fd 1
-      if [pcolor] of patch-here = green [
+      if [pcolor] of patch-here = gree [
         ask patch-here [set pcolor black]
         set nourished? true
       ]
@@ -68,10 +68,12 @@ to go
   ask turtles [
     if not nourished? [ die ]
     if will-reproduce? and gene = 1 [
-      spawn 1
+      spawn 1 3
+      die
     ]
     if will-reproduce? and gene = 0 [
-      spawn 0 2
+      spawn 0 3
+      die
     ]
   ]
   initialize-resources
@@ -171,7 +173,7 @@ num-foods
 num-foods
 0
 100
-25.0
+51.0
 1
 1
 NIL

@@ -41,7 +41,7 @@ to initialize-resources
   ask patches [ set pcolor black ]
   repeat num-foods [
     ask one-of patches [
-      set pcolor green
+      set pcolor blue
       set food? true
     ]
   ]
@@ -54,7 +54,7 @@ to go
     ask turtles [
       set heading random 360
       fd 1
-      if [pcolor] of patch-here = green [
+      if [pcolor] of patch-here = blue [
         ask patch-here [set pcolor black]
         set nourished? true
       ]
