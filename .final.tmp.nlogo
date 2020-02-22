@@ -5,6 +5,7 @@ turtles-own [
 
 ]
 patches-own [
+  ;
   food?
 ]
 
@@ -31,9 +32,9 @@ to initialize-turtles
 
 end
 
+;spawn is the function used to create the next generation of turtles
 to spawn [ alt num ]
   hatch num [ set gene alt ]
-
 end
 
 
@@ -41,7 +42,7 @@ to initialize-resources
   ask patches [ set pcolor black ]
   repeat num-foods [
     ask one-of patches [
-      set pcolor green
+      set pcolor blue
       set food? true
     ]
   ]
@@ -54,8 +55,8 @@ to go
     ask turtles [
       set heading random 360
       fd 1
-      if [pcolor] of patch-here = gree [
-        ask patch-here [set pcolor black]
+      if [pcolor] of patch-here = blue [
+        ask patch-here [set pcolor black set food? false]
         set nourished? true
       ]
       ;turtles that cross paths will reproduce at the end of a generation
@@ -124,7 +125,7 @@ num-turtles
 num-turtles
 20
 100
-100.0
+20.0
 1
 1
 NIL
@@ -173,7 +174,7 @@ num-foods
 num-foods
 0
 100
-51.0
+46.0
 1
 1
 NIL
