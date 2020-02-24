@@ -1,12 +1,14 @@
 turtles-own [
   gene ; 0 is selfish 1 is altruist
-  nourished? ;if turtle gets food within generation turtle is nourished
+  nourished? ; if turtle gets food within generation turtle is nourished
   will-reproduce?
-
+  shared-resources?
+  available-resources
 ]
 patches-own [
   ;
   food?
+  food-count
 ]
 
 to setup
@@ -21,13 +23,14 @@ to initialize-turtles
   ask turtles [
     setxy random-xcor random-ycor
     set nourished? false
+    set shared-resources? false
+    set available-resources 1
     ;initializes a certain desired percent of altruists
     if (random-float 100 < percent-altruists) [
       set gene 1
     ]
     if (gene = 0) [ set color red ]
     if (gene = 1) [ set color green ]
-
   ]
 
 end
@@ -44,6 +47,7 @@ to initialize-resources
     ask one-of patches [
       set pcolor blue
       set food? true
+      set food-count 1
     ]
   ]
 end
@@ -56,14 +60,27 @@ to go
       set heading random 360
       fd 1
       if [pcolor] of patch-here = blue [
-        ask patch-here [set pcolor black set food? false]
+        ask patch-here [set pcolor black set food? false set food-count food-count - 1]
         set nourished? true
+        set available-resources available-resources + 1
       ]
       ;turtles that cross paths will reproduce at the end of a generation
       if any? turtles-here [
         set will-reproduce? true
       ]
-    ]
+      if (count turtles-here = 2)
+      [ if (altruists-share)
+        [ ask turtles-here
+          [ set shared-resources? true
+            set available-resources available-resources - 1 ] ]
+      ]
+
+      if (count turtles-here = 2)
+      [ if (altruists-share-w/other-altruists and gene = 1)
+        [ ask turtles-here
+          [ set shared-resources? true
+            set available-resources available-resources - 1 ] ] ]
+      ]
   ]
 
   ask turtles [
@@ -79,13 +96,10 @@ to go
   ]
   initialize-resources
   ask turtles [ set will-reproduce? false set nourished? false ]
-  ;limits number of turtles on the map to ensure reasonable resource relevance
+  ; limits number of turtles on the map to ensure reasonable resource relevance
   while ([count turtles > 100]) [
     ask one-of turtles [ die ]
   ]
-
-
-
   tick
 end
 @#$#@#$#@
@@ -174,7 +188,7 @@ num-foods
 num-foods
 0
 100
-46.0
+50.0
 1
 1
 NIL
@@ -215,7 +229,7 @@ NIL
 PLOT
 222
 123
-422
+510
 273
 Gene Distribution
 number of turtles
@@ -225,7 +239,7 @@ RED = Selfish Green = Altruist
 0.0
 10.0
 true
-false
+true
 "" ""
 PENS
 "selfish" 1.0 0 -2674135 true "" "plot count turtles with [gene = 0]"
@@ -236,8 +250,8 @@ SWITCH
 296
 176
 329
-alrtuists-share
-alrtuists-share
+altruists-share
+altruists-share
 1
 1
 -1000
@@ -249,34 +263,36 @@ SWITCH
 373
 altruists-share-w/other-altruists
 altruists-share-w/other-altruists
-1
+0
 1
 -1000
 
 @#$#@#$#@
 ## WHAT IS IT?
 
-(a general understanding of what the model is trying to show or explain)
+In our model, we were trying to answer the question of how does the expression of altruism affect natural selection within generations of a species? Moreover, how does an individual’s capability to encompass altruistic behaviors, such as their concern for the wellbeing of the remainder of the species, determine the rate in which natural selection takes its course? 
+
 
 ## HOW IT WORKS
 
-(what rules the agents use to create the overall behavior of the model)
+This question is translated into something our model can test by using a species, the turtles, and their resource: food. For the sake of creating a model, we used just one resource. In the real world altruism likely has many benefits that are very difficult to quantify on their own. Therefore, the real-world translation of food could mean many things depending on the situation: social gain, emotional boosts, and so on. By manipulating the amount of food given to the turtles, and by altering the percent of altruistic turtles within the larger population, we can see how the food is shared and how quickly the turtles die out, if they do. Another variable in the model is altruism. By manipulating the altruism within our population of turtles, and recording the rate in which they die, we’re able to deduce how natural selection is affected by altruism, or lack thereof. 
+
 
 ## HOW TO USE IT
 
-(how to use the model, including a description of each of the items in the Interface tab)
+Start the model by pressing setup. You can move forward one generation by pressing the appropriate button. You can adjust the starting amount of food, or turtles with the sldiers.
 
 ## THINGS TO NOTICE
 
-(suggested things for the user to notice while running the model)
+The gene distribution chart. 
 
 ## THINGS TO TRY
 
-(suggested things for the user to try to do (move sliders, switches, etc.) with the model)
+Try adjusting the starting amounts of the values.
 
 ## EXTENDING THE MODEL
 
-(suggested things to add or change in the Code tab to make the model more complicated, detailed, accurate, etc.)
+Using more resources, implementing more realisitc attributes.
 
 ## NETLOGO FEATURES
 
@@ -288,7 +304,6 @@ altruists-share-w/other-altruists
 
 ## CREDITS AND REFERENCES
 
-(a reference to the model's URL on the web if it has one, as well as any other necessary credits, citations, and links)
 @#$#@#$#@
 default
 true
