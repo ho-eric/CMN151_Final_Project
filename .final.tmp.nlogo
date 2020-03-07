@@ -316,10 +316,10 @@ altruists-punish
 -1000
 
 PLOT
-546
-25
-746
-175
+598
+125
+798
+275
 plot 1
 NIL
 NIL
