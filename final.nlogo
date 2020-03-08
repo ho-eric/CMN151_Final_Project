@@ -1,13 +1,186 @@
+turtles-own [
+  gene ; 0 is selfish 1 is altruist
+  nourished? ; if turtle gets food within generation turtle is nourished
+  will-reproduce?
+  available-resources
+]
+patches-own [
+  ;
+  food?
+  food-count
+]
+
+globals [
+  altruist-wins
+  selfish-wins
+]
+
+to setup
+  set altruist-wins 1
+  set selfish-wins 1
+  clear-all
+  reset-ticks
+  initialize-turtles
+  initialize-resources
+end
+
+to initialize-turtles
+  create-turtles 5 [
+    setxy random-xcor random-ycor
+    set nourished? false
+    set available-resources 1
+    set gene 0
+    set color red
+  ]
+  create-turtles 5 [
+    setxy random-xcor random-ycor
+    set nourished? false
+    set available-resources 1
+    set gene 1
+    set color green
+  ]
+end
+
+
+
+
+to initialize-resources
+  ask patches [ set pcolor black ]
+  repeat num-foods [
+    ask one-of patches [
+      set pcolor blue
+      set food? true
+      set food-count 1
+    ]
+  ]
+end
+
+
+to go
+
+  if count turtles with [gene = 1] < 1 [
+
+    if count turtles with [gene = 1] < 1 [ set selfish-wins selfish-wins + 1 ]
+    clear-patches
+    clear-turtles
+    reset-ticks
+    initialize-turtles
+    initialize-resources
+    ;counts number of wins for each gene
+
+  ]
+  if count turtles with [gene = 0] < 1 [
+    if count turtles with [gene = 0] < 1 [ set altruist-wins altruist-wins + 1 ]
+    clear-patches
+    clear-turtles
+    reset-ticks
+    initialize-turtles
+    initialize-resources
+  ]
+
+  ;general movement per generation
+  repeat 100 [
+    ask turtles [
+      ;turtles will seek food first and interaction second
+      ;ifelse any? turtles in-radius 2 [ face one-of turtles in-radius 2 ] [ set heading random 360 ]
+      if any? neighbors with [pcolor = blue] [ face one-of neighbors with [ pcolor = blue ] ]
+      set heading random 360
+      fd 1
+      if [pcolor] of patch-here = blue [
+        ask patch-here [set pcolor black set food? false set food-count food-count - 1]
+        set available-resources available-resources + 2
+      ]
+
+      ;turtles that cross paths will reproduce at the end of a generation
+      if any? turtles-here [
+        set will-reproduce? true
+      ]
+
+      if (count turtles-here = 2)
+      [
+        make-altruists-share
+        make-altruists-share-with-eachother
+        make-altruists-punish
+        make-altruists-kill ]
+    ]
+  ]
+
+
+  ;reproduction will only occur if nourished and if contact has made with another
+
+  ask turtles [
+    if available-resources < 1 [ die ]
+    if will-reproduce? and gene = 1 [
+      spawn 1 2
+      die
+    ]
+    if will-reproduce? and gene = 0 [
+      spawn 0 2
+      die
+    ]
+  ]
+
+  ;resets map after each "generation"
+
+  initialize-resources
+  ask turtles [ set will-reproduce? false set available-resources 0]
+
+
+  tick
+
+
+
+end
+
+;spawn is the function used to create the next generation of turtles
+to spawn [ alt num ]
+  hatch num [ set gene alt ]
+end
+
+to make-altruists-share
+  ifelse altruists-share-w/other-altruists [
+  if ([gene] of self = 1 and available-resources > 0)[
+    set available-resources available-resources - 1
+    ask other turtles-here [
+      set available-resources available-resources + 1
+  ]]]
+  []
+
+end
+
+to make-altruists-share-with-eachother
+  if (altruists-share-w/other-altruists and [gene] of turtles-here = 1 and available-resources > 0) [
+    ask other turtles-here [
+      set available-resources available-resources + 1
+    ]
+    set available-resources available-resources - 1
+  ]
+end
+
+to make-altruists-punish
+  if (altruists-punish and [gene] of self = 1 and [gene] of other turtles-here = 0) [
+    ask other turtles-here with [gene = 0] [
+      set available-resources 0
+    ]
+  ]
+
+end
+
+to make-altruists-kill
+  if (altruists-punish and [gene] of self = 1 and [gene] of other turtles-here = 0) [
+    ask other turtles-here [ die ]
+  ]
+end
 
 @#$#@#$#@
 GRAPHICS-WINDOW
-210
-10
-647
-448
+357
+389
+671
+704
 -1
 -1
-13.0
+9.333333333333334
 1
 10
 1
@@ -27,30 +200,180 @@ GRAPHICS-WINDOW
 ticks
 30.0
 
+BUTTON
+29
+390
+92
+423
+NIL
+setup\n
+NIL
+1
+T
+OBSERVER
+NIL
+NIL
+NIL
+NIL
+1
+
+BUTTON
+175
+392
+307
+425
+-> 1 Generation
+go
+NIL
+1
+T
+OBSERVER
+NIL
+NIL
+NIL
+NIL
+1
+
+SLIDER
+29
+449
+201
+482
+num-foods
+num-foods
+0
+20
+20.0
+1
+1
+NIL
+HORIZONTAL
+
+BUTTON
+100
+391
+163
+424
+NIL
+go
+T
+1
+T
+OBSERVER
+NIL
+NIL
+NIL
+NIL
+1
+
+PLOT
+21
+20
+443
+378
+Gene Distribution
+NIL
+Turtles
+0.0
+10.0
+0.0
+10.0
+true
+true
+"" ""
+PENS
+"selfish" 1.0 0 -2674135 true "" "plot count turtles with [gene = 0]"
+"altruist" 1.0 0 -13840069 true "" "plot count turtles with [gene = 1]"
+
+SWITCH
+33
+523
+267
+556
+altruists-share-w/other-altruists
+altruists-share-w/other-altruists
+1
+1
+-1000
+
+SWITCH
+33
+567
+190
+600
+altruists-punish
+altruists-punish
+0
+1
+-1000
+
+PLOT
+447
+20
+813
+379
+Success Over Many Generations
+NIL
+NIL
+0.0
+10.0
+0.0
+10.0
+true
+true
+"" ""
+PENS
+"Altruist Wins" 1.0 0 -14439633 true "" "plot altruist-wins"
+"Selfish Wins" 1.0 0 -2674135 true "" "plot selfish-wins"
+
+SWITCH
+33
+610
+165
+643
+altruists-kill
+altruists-kill
+1
+1
+-1000
+
+MONITOR
+28
+661
+221
+722
+% success of altruism
+(altruist-wins / (selfish-wins + altruist-wins)) * 100
+2
+1
+15
+
 @#$#@#$#@
 ## WHAT IS IT?
 
-(a general understanding of what the model is trying to show or explain)
+In our model, we were trying to answer the question of how does the expression of altruism affect natural selection within generations of a species? Moreover, how does an individual’s capability to encompass altruistic behaviors, such as their concern for the wellbeing of the remainder of the species, determine the rate in which natural selection takes its course? 
+
 
 ## HOW IT WORKS
 
-(what rules the agents use to create the overall behavior of the model)
+This question is translated into something our model can test by using a species, the turtles, and their resource: food. For the sake of creating a model, we used just one resource. In the real world altruism likely has many benefits that are very difficult to quantify on their own. Therefore, the real-world translation of food could mean many things depending on the situation: social gain, emotional boosts, and so on. By manipulating the amount of food given to the turtles, and by altering the percent of altruistic turtles within the larger population, we can see how the food is shared and how quickly the turtles die out, if they do. Another variable in the model is altruism. By manipulating the altruism within our population of turtles, and recording the rate in which they die, we’re able to deduce how natural selection is affected by altruism, or lack thereof. 
+
 
 ## HOW TO USE IT
 
-(how to use the model, including a description of each of the items in the Interface tab)
+Start the model by pressing setup. You can move forward one generation by pressing the appropriate button. You can adjust the starting amount of food, or turtles with the sldiers.
 
 ## THINGS TO NOTICE
 
-(suggested things for the user to notice while running the model)
+The gene distribution chart. 
 
 ## THINGS TO TRY
 
-(suggested things for the user to try to do (move sliders, switches, etc.) with the model)
+Try adjusting the starting amounts of the values.
 
 ## EXTENDING THE MODEL
 
-(suggested things to add or change in the Code tab to make the model more complicated, detailed, accurate, etc.)
+Using more resources, implementing more realisitc attributes.
 
 ## NETLOGO FEATURES
 
@@ -61,8 +384,6 @@ ticks
 (models in the NetLogo Models Library and elsewhere which are of related interest)
 
 ## CREDITS AND REFERENCES
-
-(a reference to the model's URL on the web if it has one, as well as any other necessary credits, citations, and links)
 @#$#@#$#@
 default
 true
