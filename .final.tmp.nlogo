@@ -27,14 +27,14 @@ to setup
 end
 
 to initialize-turtles
-  create-turtles 5 [
+  create-turtles 10 [
     setxy random-xcor random-ycor
     set nourished? false
     set available-resources 1
     set gene 0
     set color red
   ]
-  create-turtles 5 [
+  create-turtles 10 [
     setxy random-xcor random-ycor
     set nourished? false
     set available-resources 1
@@ -55,11 +55,11 @@ to initialize-resources
   ]
 end
 
-
 to go
   if count turtles with [gene = 1] < 1 [
     if count turtles with [gene = 1] < 1 [
       set selfish-wins selfish-wins + 1
+      ;set num-generations num-generations + 1
     ]
     clear-patches
     clear-turtles
@@ -67,10 +67,12 @@ to go
     initialize-turtles
     initialize-resources
     ;counts number of wins for each gene
+  ]
 
   if count turtles with [gene = 0] < 1 [
     if count turtles with [gene = 0] < 1 [
       set altruist-wins altruist-wins + 1
+
     ]
     clear-patches
     clear-turtles
@@ -82,14 +84,12 @@ to go
   ;general movement per generation
   repeat 100 [
     ask turtles [
-      ;turtles will seek food first and interaction second
-      ;ifelse any? turtles in-radius 2 [ face one-of turtles in-radius 2 ] [ set heading random 360 ]
-      if any? neighbors with [pcolor = blue] [ face one-of neighbors with [ pcolor = blue ] ]
       set heading random 360
       fd 1
       if [pcolor] of patch-here = blue [
         ask patch-here [set pcolor black set food? false set food-count food-count - 1]
-        set available-resources available-resources + 2
+        set nourished? true
+        set available-resources available-resources + 1
       ]
 
       ;turtles that cross paths will reproduce at the end of a generation
@@ -97,12 +97,9 @@ to go
         set will-reproduce? true
       ]
 
-      if (count turtles-here = 2)
-      [
-        make-altruists-share
-        make-altruists-share-with-eachother
-        make-altruists-punish
-        make-altruists-kill ]
+      if (count turtles-here = 2) [
+        make-altruists-share make-altruists-share-with-eachother make-altruists-punish make-altruists-kill
+      ]
     ]
   ]
   ;reproduction will only occur if nourished and if contact has made with another
@@ -129,13 +126,13 @@ to spawn [ alt num ]
 end
 
 to make-altruists-share
-  ifelse altruists-share-w/other-altruists [
   if ([gene] of self = 1 and available-resources > 0)[
     set available-resources available-resources - 1
     ask other turtles-here [
       set available-resources available-resources + 1
-  ]]]
-  []
+    ]
+
+  ]
 end
 
 to make-altruists-share-with-eachother
@@ -149,7 +146,7 @@ end
 
 to make-altruists-punish
   if (altruists-punish and [gene] of self = 1 and [gene] of other turtles-here = 0) [
-    ask other turtles-here with [gene = 0] [
+    ask other turtles-here [
       set available-resources 0
     ]
   ]
@@ -160,13 +157,12 @@ to make-altruists-kill
     ask other turtles-here [ die ]
   ]
 end
-
 @#$#@#$#@
 GRAPHICS-WINDOW
-357
-389
-671
-704
+817
+21
+1133
+338
 -1
 -1
 9.333333333333334
@@ -232,7 +228,7 @@ num-foods
 num-foods
 0
 20
-20.0
+9.0
 1
 1
 NIL
@@ -281,7 +277,7 @@ SWITCH
 556
 altruists-share-w/other-altruists
 altruists-share-w/other-altruists
-1
+0
 1
 -1000
 
@@ -322,21 +318,20 @@ SWITCH
 643
 altruists-kill
 altruists-kill
-1
+0
 1
 -1000
 
 MONITOR
-28
-661
-221
-722
+1141
+83
+1334
+144
 % success of altruism
-(altruist-wins / (selfish-wins + altruist-wins)) * 100
+(altruist-wins / selfish-wins) * 100
 2
 1
 15
-
 
 MONITOR
 1141
