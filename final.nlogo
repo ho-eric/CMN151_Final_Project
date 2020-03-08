@@ -235,7 +235,7 @@ num-foods
 num-foods
 0
 20
-6.0
+9.0
 1
 1
 NIL
@@ -325,9 +325,20 @@ SWITCH
 643
 altruists-kill
 altruists-kill
-1
+0
 1
 -1000
+
+MONITOR
+28
+661
+221
+722
+% success of altruism
+(altruist-wins / selfish-wins) * 100
+2
+1
+15
 
 @#$#@#$#@
 ## WHAT IS IT?

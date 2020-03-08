@@ -103,12 +103,12 @@ to go
 
   ask turtles [
     if available-resources < 1 [ die ]
-    if gene = 1 [
-      spawn 1 1
+    if will-reproduce? and gene = 1 [
+      spawn 1 2
       die
     ]
-    ifgene = 0 [
-      spawn 0 1
+    if will-reproduce? and gene = 0 [
+      spawn 0 2
       die
     ]
   ]
@@ -235,7 +235,7 @@ num-foods
 num-foods
 0
 20
-6.0
+14.0
 1
 1
 NIL
@@ -325,9 +325,20 @@ SWITCH
 643
 altruists-kill
 altruists-kill
-1
+0
 1
 -1000
+
+MONITOR
+28
+661
+221
+722
+% success of altruism
+(altruist-wins / selfish-wins) * 100
+5
+1
+15
 
 @#$#@#$#@
 ## WHAT IS IT?
