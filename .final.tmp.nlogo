@@ -97,31 +97,7 @@ to go
         set will-reproduce? true
       ]
 
-     if (count turtles-here = 2)
-      [
-        make-altruists-share
-        make-altruists-share-with-eachother
-        make-altruists-punish
-        make-altruists-kill ]
-    ]
-  ]
-  ;reproduction will only occur if nourished and if contact has made with another
-  ask turtles [
-    if available-resources < 1 [ die ]
-    if will-reproduce? and gene = 1 [
-      spawn 1 2
-      die
-    ]
-    if will-reproduce? and gene = 0 [
-      spawn 0 2
-      die
-    ]
-  ]
-  ;resets map after each "generation"
-  initialize-resources
-  ask turtles [ set will-reproduce? false set available-resources 0]
-  tick
-end
+
 
 ;spawn is the function used to create the next generation of turtles
 to spawn [ alt num ]
@@ -129,13 +105,13 @@ to spawn [ alt num ]
 end
 
 to make-altruists-share
-  ifelse altruists-share-w/other-altruists [
   if ([gene] of self = 1 and available-resources > 0)[
     set available-resources available-resources - 1
     ask other turtles-here [
       set available-resources available-resources + 1
-  ]]]
-  []
+    ]
+
+  ]
 end
 
 to make-altruists-share-with-eachother
@@ -149,7 +125,7 @@ end
 
 to make-altruists-punish
   if (altruists-punish and [gene] of self = 1 and [gene] of other turtles-here = 0) [
-    ask other turtles-here with [gene = 0] [
+    ask other turtles-here [
       set available-resources 0
     ]
   ]
