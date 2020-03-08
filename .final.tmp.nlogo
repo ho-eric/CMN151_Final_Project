@@ -4,8 +4,8 @@ turtles-own [
   will-reproduce?
   available-resources
 ]
+
 patches-own [
-  ;
   food?
   food-count
 ]
@@ -13,6 +13,7 @@ patches-own [
 globals [
   altruist-wins
   selfish-wins
+  num-generations
 ]
 
 to setup
@@ -41,9 +42,6 @@ to initialize-turtles
   ]
 end
 
-
-
-
 to initialize-resources
   ask patches [ set pcolor black ]
   repeat num-foods [
@@ -55,22 +53,25 @@ to initialize-resources
   ]
 end
 
-
 to go
-
   if count turtles with [gene = 1] < 1 [
-
-    if count turtles with [gene = 1] < 1 [ set selfish-wins selfish-wins + 1 ]
+    if count turtles with [gene = 1] < 1 [
+      set selfish-wins selfish-wins + 1
+      set num-generations num-generations + 1
+    ]
     clear-patches
     clear-turtles
     reset-ticks
     initialize-turtles
     initialize-resources
     ;counts number of wins for each gene
-
   ]
+
   if count turtles with [gene = 0] < 1 [
-    if count turtles with [gene = 0] < 1 [ set altruist-wins altruist-wins + 1 ]
+    if count turtles with [gene = 0] < 1 [
+      set altruist-wins altruist-wins + 1
+      set num-generations num-generations + 1
+    ]
     clear-patches
     clear-turtles
     reset-ticks
@@ -94,13 +95,12 @@ to go
         set will-reproduce? true
       ]
 
-      if (count turtles-here = 2)[ make-altruists-share make-altruists-share-with-eachother make-altruists-punish make-altruists-kill ]
+      if (count turtles-here = 2) [
+        make-altruists-share make-altruists-share-with-eachother make-altruists-punish make-altruists-kill
+      ]
     ]
   ]
-
-
   ;reproduction will only occur if nourished and if contact has made with another
-
   ask turtles [
     if available-resources < 1 [ die ]
     if will-reproduce? and gene = 1 [
@@ -112,17 +112,10 @@ to go
       die
     ]
   ]
-
   ;resets map after each "generation"
-
   initialize-resources
   ask turtles [ set will-reproduce? false set available-resources 0]
-
-
   tick
-
-
-
 end
 
 ;spawn is the function used to create the next generation of turtles
@@ -155,7 +148,6 @@ to make-altruists-punish
       set available-resources 0
     ]
   ]
-
 end
 
 to make-altruists-kill
@@ -163,13 +155,12 @@ to make-altruists-kill
     ask other turtles-here [ die ]
   ]
 end
-
 @#$#@#$#@
 GRAPHICS-WINDOW
 357
 389
-671
-704
+673
+706
 -1
 -1
 9.333333333333334
@@ -235,7 +226,7 @@ num-foods
 num-foods
 0
 20
-14.0
+9.0
 1
 1
 NIL
@@ -336,9 +327,20 @@ MONITOR
 722
 % success of altruism
 (altruist-wins / selfish-wins) * 100
-5
+2
 1
 15
+
+MONITOR
+826
+20
+932
+65
+num-generations
+num-generations
+0
+1
+11
 
 @#$#@#$#@
 ## WHAT IS IT?
