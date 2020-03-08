@@ -16,29 +16,29 @@ globals [
 ]
 
 to setup
+  set altruist-wins 1
+  set selfish-wins 1
   clear-all
   reset-ticks
   initialize-turtles
   initialize-resources
-  set altruist-wins 0
-  set selfish-wins 0
-
 end
 
 to initialize-turtles
-  create-turtles num-turtles
-  ask turtles [
+  create-turtles 10 [
     setxy random-xcor random-ycor
     set nourished? false
     set available-resources 1
-    ;initializes a certain desired percent of altruists
-    if (random-float 100 < percent-altruists) [
-      set gene 1
-    ]
-    if (gene = 0) [ set color red ]
-    if (gene = 1) [ set color green ]
+    set gene 0
+    set color red
   ]
-
+  create-turtles 10 [
+    setxy random-xcor random-ycor
+    set nourished? false
+    set available-resources 1
+    set gene 1
+    set color green
+  ]
 end
 
 
@@ -58,14 +58,24 @@ end
 
 to go
 
-  if count turtles with [gene = 1] < 1 or count turtles with [gene = 0] < 1 [
-    clear-all
+  if count turtles with [gene = 1] < 1 [
+
+    if count turtles with [gene = 1] < 1 [ set selfish-wins selfish-wins + 1 ]
+    clear-patches
+    clear-turtles
     reset-ticks
     initialize-turtles
     initialize-resources
     ;counts number of wins for each gene
-    if count turtles with [gene = 1] < 1 [ set selfish-wins selfish-wins + 1 ]
+
+  ]
+  if count turtles with [gene = 0] < 1 [
     if count turtles with [gene = 0] < 1 [ set altruist-wins altruist-wins + 1 ]
+    clear-patches
+    clear-turtles
+    reset-ticks
+    initialize-turtles
+    initialize-resources
   ]
 
   ;general movement per generation
@@ -84,10 +94,7 @@ to go
         set will-reproduce? true
       ]
 
-      if (count turtles-here = 2)[ make-altruists-share make-altruists-share-with-eachother make-altruists-punish ]
-
-
-
+      if (count turtles-here = 2)[ make-altruists-share make-altruists-share-with-eachother make-altruists-punish make-altruists-kill ]
     ]
   ]
 
@@ -112,7 +119,7 @@ to go
   ask turtles [ set will-reproduce? false set available-resources 0]
 
 
-    tick
+  tick
 
 
 
@@ -124,16 +131,17 @@ to spawn [ alt num ]
 end
 
 to make-altruists-share
-  if ([gene] of self = 1 and available-resources > 1)[
+  if ([gene] of self = 1 and available-resources > 0)[
+    set available-resources available-resources - 1
     ask other turtles-here [
       set available-resources available-resources + 1
     ]
-    set available-resources available-resources - 1
+
   ]
 end
 
 to make-altruists-share-with-eachother
-  if (altruists-share-w/other-altruists and [gene] of turtles-here = 1 and available-resources > 1) [
+  if (altruists-share-w/other-altruists and [gene] of turtles-here = 1 and available-resources > 0) [
     ask other turtles-here [
       set available-resources available-resources + 1
     ]
@@ -150,15 +158,21 @@ to make-altruists-punish
 
 end
 
+to make-altruists-kill
+  if (altruists-punish and [gene] of self = 1 and [gene] of other turtles-here = 0) [
+    ask other turtles-here [ die ]
+  ]
+end
+
 @#$#@#$#@
 GRAPHICS-WINDOW
-319
-278
-756
-716
+357
+389
+671
+704
 -1
 -1
-13.0
+9.333333333333334
 1
 10
 1
@@ -178,26 +192,11 @@ GRAPHICS-WINDOW
 ticks
 30.0
 
-SLIDER
-19
-136
-191
-169
-num-turtles
-num-turtles
-20
-100
-20.0
-1
-1
-NIL
-HORIZONTAL
-
 BUTTON
-13
-18
-76
-51
+29
+390
+92
+423
 NIL
 setup\n
 NIL
@@ -211,10 +210,10 @@ NIL
 1
 
 BUTTON
-14
-63
-146
-96
+175
+392
+307
+425
 -> 1 Generation
 go
 NIL
@@ -228,40 +227,25 @@ NIL
 1
 
 SLIDER
-18
-185
-190
-218
+29
+449
+201
+482
 num-foods
 num-foods
 0
-100
-50.0
-1
-1
-NIL
-HORIZONTAL
-
-SLIDER
-16
-233
-188
-266
-percent-altruists
-percent-altruists
-0
-100
-50.0
+20
+6.0
 1
 1
 NIL
 HORIZONTAL
 
 BUTTON
-84
-19
-147
-52
+100
+391
+163
+424
 NIL
 go
 T
@@ -275,13 +259,13 @@ NIL
 1
 
 PLOT
-210
+21
 20
-498
-170
+443
+378
 Gene Distribution
-number of turtles
-RED = Selfish Green = Altruist
+NIL
+Turtles
 0.0
 10.0
 0.0
@@ -294,33 +278,33 @@ PENS
 "altruist" 1.0 0 -13840069 true "" "plot count turtles with [gene = 1]"
 
 SWITCH
-27
-340
-290
-373
+33
+523
+267
+556
 altruists-share-w/other-altruists
 altruists-share-w/other-altruists
-1
+0
 1
 -1000
 
 SWITCH
-70
-415
-227
-448
+33
+567
+190
+600
 altruists-punish
 altruists-punish
-1
+0
 1
 -1000
 
 PLOT
-546
-25
-746
-175
-plot 1
+447
+20
+813
+379
+Success Over Many Generations
 NIL
 NIL
 0.0
@@ -331,7 +315,19 @@ true
 true
 "" ""
 PENS
-"default" 1.0 0 -16777216 true "" "plot altruist-wins"
+"Altruist Wins" 1.0 0 -14439633 true "" "plot altruist-wins"
+"Selfish Wins" 1.0 0 -2674135 true "" "plot selfish-wins"
+
+SWITCH
+33
+610
+165
+643
+altruists-kill
+altruists-kill
+1
+1
+-1000
 
 @#$#@#$#@
 ## WHAT IS IT?
