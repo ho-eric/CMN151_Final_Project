@@ -34,6 +34,7 @@ to initialize-turtles
     set gene 0
     set color red
   ]
+
   create-turtles 5 [
     setxy random-xcor random-ycor
     set nourished? false
@@ -97,7 +98,32 @@ to go
         set will-reproduce? true
       ]
 
-
+     if (count turtles-here = 2)
+      [
+        make-altruists-share
+        make-altruists-share-with-eachother
+        make-altruists-punish
+        make-altruists-kill
+      ]
+    ]
+  ]
+  ;reproduction will only occur if nourished and if contact has made with another
+  ask turtles [
+    if available-resources < 1 [ die ]
+    if will-reproduce? and gene = 1 [
+      spawn 1 2
+      die
+    ]
+    if will-reproduce? and gene = 0 [
+      spawn 0 2
+      die
+    ]
+  ]
+  ;resets map after each "generation"
+  initialize-resources
+  ask turtles [ set will-reproduce? false set available-resources 0]
+  tick
+end
 
 ;spawn is the function used to create the next generation of turtles
 to spawn [ alt num ]
@@ -105,13 +131,15 @@ to spawn [ alt num ]
 end
 
 to make-altruists-share
-  if ([gene] of self = 1 and available-resources > 0)[
-    set available-resources available-resources - 1
-    ask other turtles-here [
-      set available-resources available-resources + 1
+  ifelse altruists-share-w/other-altruists [
+    if ([gene] of self = 1 and available-resources > 0) [
+      set available-resources available-resources - 1
+      ask other turtles-here [
+        set available-resources available-resources + 1
+      ]
     ]
-
   ]
+  []
 end
 
 to make-altruists-share-with-eachother
@@ -125,7 +153,7 @@ end
 
 to make-altruists-punish
   if (altruists-punish and [gene] of self = 1 and [gene] of other turtles-here = 0) [
-    ask other turtles-here [
+    ask other turtles-here with [gene = 0] [
       set available-resources 0
     ]
   ]
@@ -236,7 +264,7 @@ PLOT
 443
 378
 Gene Distribution
-NIL
+Ticks
 Turtles
 0.0
 10.0
@@ -250,10 +278,10 @@ PENS
 "altruist" 1.0 0 -13840069 true "" "plot count turtles with [gene = 1]"
 
 SWITCH
-33
-523
-267
-556
+29
+496
+263
+529
 altruists-share-w/other-altruists
 altruists-share-w/other-altruists
 0
@@ -261,10 +289,10 @@ altruists-share-w/other-altruists
 -1000
 
 SWITCH
-33
-567
-190
-600
+29
+540
+186
+573
 altruists-punish
 altruists-punish
 0
@@ -277,8 +305,8 @@ PLOT
 813
 379
 Success Over Many Generations
-NIL
-NIL
+Ticks
+Successes
 0.0
 10.0
 0.0
@@ -291,10 +319,10 @@ PENS
 "Selfish Wins" 1.0 0 -2674135 true "" "plot selfish-wins"
 
 SWITCH
-33
-610
-165
-643
+29
+583
+161
+616
 altruists-kill
 altruists-kill
 0
@@ -307,7 +335,7 @@ MONITOR
 1334
 144
 % success of altruism
-(altruist-wins / selfish-wins) * 100
+(altruist-wins / (selfish-wins + altruist-wins)) * 100
 2
 1
 15
@@ -336,15 +364,15 @@ This question is translated into something our model can test by using a species
 
 ## HOW TO USE IT
 
-Start the model by pressing setup. You can move forward one generation by pressing the appropriate button. You can adjust the starting amount of food, or turtles with the sldiers.
+Start the model by pressing setup. You can move forward one generation by pressing the corresponding button. You can adjust the starting amount of food, and you can adjust the properties of the altruists with the different switches. 
 
 ## THINGS TO NOTICE
 
-The gene distribution chart. 
+The number of altruists and selfish turtles in the gene distribution chart and the chart of the successes of altruists and selfish turtles over time and how they change depending on the switches that are enabled. 
 
 ## THINGS TO TRY
 
-Try adjusting the starting amounts of the values.
+Try adjusting the starting amounts of the resources and playi
 
 ## EXTENDING THE MODEL
 
