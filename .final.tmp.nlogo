@@ -57,10 +57,9 @@ to initialize-resources
 end
 
 to go
-  if count turtles with [gene = 1] < 1 [
-    if count turtles with [gene = 1] < 1 [
-      set selfish-wins selfish-wins + 1
-    ]
+  if count turtles with [gene = 1] < 1 and count turtles with [gene = 0] > 1 [
+
+    set selfish-wins selfish-wins + 1
     clear-patches
     clear-turtles
     reset-ticks
@@ -69,10 +68,9 @@ to go
     ;counts number of wins for each gene
   ]
 
-  if count turtles with [gene = 0] < 1 [
-    if count turtles with [gene = 0] < 1 [
-      set altruist-wins altruist-wins + 1
-    ]
+  if count turtles with [gene = 0] < 1 and count turtles with [gene = 1] > 1 [
+
+    set altruist-wins altruist-wins + 1
     clear-patches
     clear-turtles
     reset-ticks
@@ -80,11 +78,23 @@ to go
     initialize-resources
   ]
 
+  if count turtles with [gene = 0] < 1 and count turtles with [gene = 1] < 1 [
+    clear-patches
+    clear-turtles
+    reset-ticks
+    initialize-turtles
+    initialize-resources
+  ]
+
+
+
+
+
   ;general movement per generation
   repeat 100 [
     ask turtles [
       ;turtles will seek food first and interaction second
-      ;ifelse any? turtles in-radius 2 [ face one-of turtles in-radius 2 ] [ set heading random 360 ]
+      ifelse any? turtles in-radius 2 [ face one-of turtles in-radius 2 ] [ set heading random 360 ]
       if any? neighbors with [pcolor = blue] [ face one-of neighbors with [ pcolor = blue ] ]
       set heading random 360
       fd 1
@@ -235,7 +245,7 @@ num-foods
 num-foods
 0
 20
-9.0
+5.0
 1
 1
 NIL
@@ -372,11 +382,11 @@ The number of altruists and selfish turtles in the gene distribution chart and t
 
 ## THINGS TO TRY
 
-Try adjusting the starting amounts of the resources and playi
+Try adjusting the starting amounts of the resources and playing around with the switches.
 
 ## EXTENDING THE MODEL
 
-Using more resources, implementing more realisitc attributes.
+Using more resources, having those resources have different values/weights, implementing more realisitc features.
 
 ## NETLOGO FEATURES
 

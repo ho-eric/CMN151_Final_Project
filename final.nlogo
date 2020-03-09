@@ -57,10 +57,9 @@ to initialize-resources
 end
 
 to go
-  if count turtles with [gene = 1] < 1 [
-    if count turtles with [gene = 1] < 1 [
-      set selfish-wins selfish-wins + 1
-    ]
+  if count turtles with [gene = 1] < 1 and count turtles with [gene = 0] > 1 [
+
+    set selfish-wins selfish-wins + 1
     clear-patches
     clear-turtles
     reset-ticks
@@ -69,16 +68,27 @@ to go
     ;counts number of wins for each gene
   ]
 
-  if count turtles with [gene = 0] < 1 [
-    if count turtles with [gene = 0] < 1 [
-      set altruist-wins altruist-wins + 1
-    ]
+  if count turtles with [gene = 0] < 1 and count turtles with [gene = 1] > 1 [
+
+    set altruist-wins altruist-wins + 1
     clear-patches
     clear-turtles
     reset-ticks
     initialize-turtles
     initialize-resources
   ]
+
+  if count turtles with [gene = 0] < 1 and count turtles with [gene = 1] < 1 [
+    clear-patches
+    clear-turtles
+    reset-ticks
+    initialize-turtles
+    initialize-resources
+  ]
+
+
+
+
 
   ;general movement per generation
   repeat 100 [
@@ -235,7 +245,7 @@ num-foods
 num-foods
 0
 20
-9.0
+5.0
 1
 1
 NIL
@@ -295,7 +305,7 @@ SWITCH
 573
 altruists-punish
 altruists-punish
-0
+1
 1
 -1000
 
@@ -325,7 +335,7 @@ SWITCH
 616
 altruists-kill
 altruists-kill
-0
+1
 1
 -1000
 
